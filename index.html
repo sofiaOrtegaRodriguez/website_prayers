@@ -329,6 +329,16 @@
 
         ::-webkit-scrollbar { width: 16px; background: var(--win-gray); }
         ::-webkit-scrollbar-thumb { background: var(--win-gray); border: 2px outset var(--win-light); }
+
+         /* Estado Maximizado */
+        .window.maximized {
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: calc(100% - 40px) !important; /* Restamos los 40px de la barra de tareas */
+            border: none !important;
+            box-shadow: none !important;
+        }
     </style>
 </head>
 <body>
@@ -387,13 +397,6 @@
         </div>
     </div>
 
-    <!-- CONTENEDOR PARA ABRIR LISTO.HTML -->
-    <div id="external-app-overlay">
-        <!-- BOTÓN PARA SALIR DEL DIARIO -->
-        <button id="exit-external-btn" onclick="closeListoApp()">✖ SALIR A WINDOWS</button>
-        <!-- IFRAME QUE CARGA EL ARCHIVO LOCAL -->
-        <iframe id="listo-frame" src=""></iframe>
-    </div>
 
 
     <!-- VENTANA: SELECTOR DE ESTADO (MOOD) -->
@@ -444,6 +447,21 @@
                     </button>
                 </div>
             </fieldset>
+        </div>
+    </div>
+
+    
+    <div id="window-diario" class="window" style="top: 50px; left: 50px; width: 900px; height: 600px; z-index: 105; display: none; flex-direction: column;">
+        <div class="title-bar" onmousedown="dragMouseDown(event, 'window-diario')" ondblclick="toggleMaximize('window-diario')">
+            <span><i class="fas fa-book"></i> Diario.exe</span>
+            <div class="title-bar-controls">
+                <button onclick="minimizeDiario()">_</button>
+                <button onclick="toggleMaximize('window-diario')">□</button>
+                <button onclick="closeDiarioApp()">X</button>
+            </div>
+        </div>
+        <div class="window-body" style="padding: 0; flex-grow: 1; height: 100%;">
+            <iframe id="diario-frame" src="" style="width: 100%; height: 100%; border: none;"></iframe>
         </div>
     </div>
 
@@ -670,28 +688,42 @@
             audio.play().catch(e => console.log("Audio autoplay bloqueado"));
         }
 
-        // --- FUNCIÓN PARA ABRIR LISTO.HTML (DIARIO) ---
+        // --- FUNCIÓN PARA ABRIR/GESTIONAR DIARIO ---
         function openListoApp() {
-            const overlay = document.getElementById('external-app-overlay');
-            const frame = document.getElementById('listo-frame');
+            const win = document.getElementById('window-diario');
+            const frame = document.getElementById('diario-frame');
             
-            // Muestra el contenedor
-            overlay.style.display = 'block';
-            
-            // Carga el archivo local "listo.html"
-            // IMPORTANTE: listo.html debe estar en la misma carpeta
-            frame.src = 'listo.html';
+            // Mostramos la ventana
+            win.style.display = 'flex';
+            bringToFront('window-diario');
+        
+            // Solo cargamos el archivo si el iframe está vacío.
+            // Esto permite que si "minimizaste", al volver a abrir siga todo igual.
+            if (frame.getAttribute('src') === "") {
+                frame.src = 'listo.html'; 
+            }
+        }
+        
+        function minimizeDiario() {
+            // Solo oculta la ventana, pero MANTIENE el diario abierto en segundo plano
+            document.getElementById('window-diario').style.display = 'none';
         }
 
-        function closeListoApp() {
-            const overlay = document.getElementById('external-app-overlay');
-            const frame = document.getElementById('listo-frame');
+        function toggleMaximize(id) {
+            const win = document.getElementById(id);
+            // Alternar la clase 'maximized'
+            win.classList.toggle('maximized');
+        }
+        function closeDiarioApp() {
+            const win = document.getElementById('window-diario');
+            const frame = document.getElementById('diario-frame');
             
-            // Oculta el contenedor
-            overlay.style.display = 'none';
+            // Oculta la ventana
+            win.style.display = 'none';
             
-            // Limpia el src para detener scripts/audio que se estén ejecutando en listo.html
-            frame.src = '';
+            // IMPORTANTE: Limpia el src. Esto "apaga" el diario completamente.
+            // Si quieres que se guarde el estado aunque le den a la X, borra la siguiente línea:
+            
         }
 
         // --- SISTEMA DE VENTANAS ---
@@ -863,5 +895,6 @@
     </script>
 </body>
 </html>
+
 
 
