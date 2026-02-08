@@ -397,6 +397,7 @@
 
 
     <!-- VENTANA: SELECTOR DE ESTADO (MOOD) -->
+
     <div id="window-mood" class="window" style="top: 80px; left: 120px; z-index: 101;">
         <div class="title-bar" onmousedown="dragMouseDown(event, 'window-mood')">
             <span><i class="fas fa-heart"></i> ¿Cómo estás hoy?</span>
@@ -405,7 +406,6 @@
             </div>
         </div>
         <div class="window-body">
-            <!-- Saludo al usuario -->
             <p id="greeting-text" style="margin-top: 0; font-style: italic; text-align: center; color: var(--win-blue); font-weight: bold;">Bienvenido.</p>
             <fieldset>
                 <legend>Diagnóstico del Alma</legend>
@@ -430,8 +430,16 @@
                         <option value="enfermedad">🤕 Enfermedad / Dolor</option>
                     </optgroup>
                 </select>
+
+                <div id="verse-display" style="display:none; margin-top:15px;">
+                    <div id="verse-content" class="verse-text"></div>
+                    <div id="verse-reference" class="verse-ref"></div>
+                    <div style="text-align: right; margin-top: 5px;">
+                        <button class="btn-retro" style="font-size: 10px;" onclick="addToFavorites()">⭐ GUARDAR.FAV</button>
+                    </div>
+                </div>
                 <div style="text-align: center; margin-top: 10px;">
-                    <button class="btn-retro" onclick="fetchVerse()">
+                    <button class="btn-retro" onclick="getVerse()">
                         <i class="fas fa-search"></i> BUSCAR.EXE
                     </button>
                 </div>
